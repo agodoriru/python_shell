@@ -4,9 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-prompt-toolkit = "*"
 click = "*"
 datetime = "*"
+fuzzyfinder = "*"
+pygments = "*"
+prompt-toolkit = "*"
 
 [dev-packages]
 

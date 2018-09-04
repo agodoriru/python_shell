@@ -2,43 +2,99 @@ from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import Completer, Completion, WordCompleter
+from prompt_toolkit.styles import Style
 import click
 import datetime
 from fuzzyfinder import fuzzyfinder
 
 CommandCompleter = WordCompleter([
-    'add', 'any', 'edit', 'run', 'fix','show', 'delete', 'config', 'exit', 'ip', 'port', 'dst', 'src', 'history'],
-    ignore_case = True)
+'edit', 'run','show', 'stop', 'delete', 'config', 'exit', 'history'],
+ignore_case = True)
+
+style = Style.from_dict({
+	'completion-menu.completion': 'bg:#008888 #ffffff',
+	'completion-menu.completion.current': 'bg:#00aaaa #000000',
+	'scrollbar.background': 'bg:#88aaaa',
+	'scrollbar.button': 'bg:#222222',
+})
 
 def main():
-    now = datetime.datetime.now()
-    print('\nacticated     time' + str(now))
+	now = datetime.datetime.now()
+	print('acticated ' + str(now))
 
-    while 1:
-        try:
-            user_input = prompt('DPDK FW>',
-                                history = FileHistory('history.txt'),
-                                complete_while_typing = True,
-                                completer = CommandCompleter,
-                                )
+	while 1:
+		try:
+			user_input = prompt('DPDK FW>',
+								history = FileHistory('data/history'),
+								complete_while_typing = True,
+								completer = CommandCompleter,
+								style=style,
+								)
 
-            print('input:' + user_input)
-            print(type(user_input))
-            #click.echo_via_pager(user_input)
-            #message = click.edit()    
-            # print(user_input)
-            #click.edit(filepath) -> edit launch
-            if(user_input == 'exit'):
-                break
-        
-        except KeyboardInterrupt:
-            continue
-        except EOFError:
-            break
+			# print('input:' + user_input)
+			# print(type(user_input))
+			# print(user_input)
+			# print(type(user_input))
 
-    print('Good Bye')
+			user_input = user_input.split()
+			command = None
+			arg = None
+
+			try:
+				command = user_input[0]
+				# print('command:' + command)
+			except:
+				pass
+			
+			try:
+				arg = user_input[1]
+				# print('arg:'+arg)
+			except IndexError:
+				pass
+			
+			#click.echo_via_pager(user_input)
+
+			if command == 'exit':
+				break
+			elif command == 'run':
+				print('will run DPDK app')
+			elif command == 'stop':
+				print('will stop DPDK app')
+			elif command == 'show':
+				if arg is None:
+					print('usage:'+command)
+				elif arg is not None:
+					arg = 'data/'+arg
+					try:
+						f=open(arg, 'r')
+						data = f.read()
+						print('filename:'+arg)
+						print('=====================')
+						print(data, end='')
+						print('=====================')
+						f.close()
+					except FileNotFoundError:
+						print(arg+':file or directory not found')
+			elif command == 'edit':
+				if arg is None:
+					print('usage:'+command)
+					
+				elif arg is not None:
+					f='data/' +arg
+					print(f)
+					click.edit(filename=f)
+					# print(user_input)
+			elif command == 'delete':
+				print('not yet')
+			else:
+				print(command+':command is not defined')
+			
+		except KeyboardInterrupt:
+			continue
+		except EOFError:
+			break
+
+	print('Good Bye')
     
 if __name__ == '__main__':
-    main()
-
-
+	main()

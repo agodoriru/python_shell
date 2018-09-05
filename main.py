@@ -1,3 +1,6 @@
+import sys
+import subprocess
+
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -8,8 +11,10 @@ import datetime
 from fuzzyfinder import fuzzyfinder
 
 CommandCompleter = WordCompleter([
-'edit', 'run','show', 'stop', 'delete', 'config', 'exit', 'history'],
-ignore_case = True)
+	'edit', 'run','show', 'stop', 'quit',  'delete', 'config', 'exit', 'history', 'rerun',
+	'add', 'del', 'any', 'ip', 'port', 'dst', 'src', 'block', 'pass'],
+	ignore_case = True
+	)
 
 style = Style.from_dict({
 	'completion-menu.completion': 'bg:#008888 #ffffff',
@@ -45,16 +50,16 @@ def main():
 				# print('command:' + command)
 			except:
 				pass
-			
+
 			try:
 				arg = user_input[1]
 				# print('arg:'+arg)
 			except IndexError:
 				pass
-			
-			#click.echo_via_pager(user_input)
 
 			if command == 'exit':
+				break
+			elif command == 'quit':
 				break
 			elif command == 'run':
 				print('will run DPDK app')
@@ -78,7 +83,6 @@ def main():
 			elif command == 'edit':
 				if arg is None:
 					print('usage:'+command)
-					
 				elif arg is not None:
 					f='data/' +arg
 					print(f)
@@ -86,6 +90,8 @@ def main():
 					# print(user_input)
 			elif command == 'delete':
 				print('not yet')
+			elif command is None:
+				pass
 			else:
 				print(command+':command is not defined')
 			

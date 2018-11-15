@@ -1,5 +1,9 @@
 import sys
 import subprocess
+import os
+import socket
+import subprocess
+
 
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
@@ -25,9 +29,35 @@ style = Style.from_dict({
 })
 
 
+class Server:
+    def __init__(self, socket_path):
+        self.socket_path = socket_path
+
+    def start(self):
+        s = self.socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.bind(self.socket_path)
+        s.listen(1)
+
+        try:
+            try:
+
+                while True:
+                    connection, address = s.accept()
+                    sys.stdout.write("connected\n")
+                    sys.stdout.write("disconnect\n")
+
+            finally:
+                sys.stdout.write("Exit...")
+                os.remove(self.socket_path)
+
+        except KeyboardInterrupt:
+            sys.stdout.write("Exit...")
+            sys.exit()
+
+
 def main():
     now = datetime.datetime.now()
-    print('acticated ' + str(now))
+    print('acticated ', now)
 
     while 1:
         try:
@@ -39,7 +69,7 @@ def main():
                                 style=style,
                                 )
 
-            # print('input:' + user_input)
+            print('input:' + user_input)
             # print(type(user_input))
             # print(user_input)
             # print(type(user_input))
@@ -66,8 +96,16 @@ def main():
                 break
             elif command == 'run':
                 print('will run DPDK app')
+                dpdk = subprocess.Popen('./a.out')
+                pid = dpdk.pid
             elif command == 'stop':
-                print('will stop DPDK app')
+                dpdk.terminate()
+                print('terminate DPDK app')
+
+            elif command == 'kill':
+                dpdk.kill()
+                print('kill DPDK app')
+
             elif command == 'show':
                 if arg is None:
                     print('usage:' + command)
